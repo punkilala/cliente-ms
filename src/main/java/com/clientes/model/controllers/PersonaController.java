@@ -2,6 +2,8 @@ package com.clientes.model.controllers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -16,11 +18,15 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.clientes.model.PersonaBean;
+import com.clientes.service.PersonaAsynService;
 
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 @RestController
 public class PersonaController {
-	@Autowired
-	private WebClient webClient;
+	private final PersonaAsynService personaAsynService;
+	private final WebClient webClient;
 	private String urlBase = "http://localhost:8080/";
 	
 	@GetMapping(value = "/persona/{nombre}/{email}/{edad}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -62,13 +68,17 @@ public class PersonaController {
 		return Arrays.asList(personas);	
 	}
 	
-//	@GetMapping(value = "/persona/{edad1}/{edad2}")
-//	public List<PersonaBean> buscarPorRandoEdad (
-//			@PathVariable ("edad1") int edad1,
-//			@PathVariable ("edad2")int edad2) {
-//		PersonaBean[] personas = restTemplate.getForObject(urlBase + "/contactos", PersonaBean[].class);
-//		return Arrays.stream(personas).filter(p->p.getEdad() >= edad1 && p.getEdad() <= edad2 ).collect(Collectors.toList());
-//		
-//	}
+	//alta asincrona 
+	@GetMapping(value = "/personaAsyn/{nombre}/{email}/{edad}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public List<PersonaBean> altaPersonaAsyn (String nombre, String email, int edad){
+		PersonaBean persona = new PersonaBean(nombre, email, edad);
+		CompletableFuture<List<PersonaBean>> result = personaAsynService.llamadaAsincrona(persona);
+		try {
+			return result.get();
+		} catch (InterruptedException | ExecutionException e) {
+			return null;
+		}
+	}
+	
 
 }

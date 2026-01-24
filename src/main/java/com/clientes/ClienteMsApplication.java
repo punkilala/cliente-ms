@@ -12,11 +12,5 @@ public class ClienteMsApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(ClienteMsApplication.class, args);
 	}
-	
-	//crear bean para las llamadas con RestTemplate
-	@Bean
-	public WebClient webClient() {
-		return WebClient.create();
-	}
 
 }
