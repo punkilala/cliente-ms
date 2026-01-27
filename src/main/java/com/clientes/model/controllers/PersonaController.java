@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,7 +31,7 @@ public class PersonaController {
 	private String urlBase = "http://localhost:8080/";
 	
 	@GetMapping(value = "/persona/{nombre}/{email}/{edad}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<PersonaBean> altaPersona(
+	public ResponseEntity<List<PersonaBean>> altaPersona(
 			@PathVariable("nombre") String nombre,
 			@PathVariable("email") String email,
 			@PathVariable("edad") int edad){
@@ -61,23 +62,21 @@ public class PersonaController {
 			.get()//RequestHeadersUriSpec
 			.uri(urlBase + "/contactos"
 					+ "" ) //devuelve ResquestHeaderSpec
+			.headers(h -> h.setBasicAuth("user2", "1234"))
 			.retrieve()//lanza llamada y devuel ve ResponseSpec
 			.bodyToMono(PersonaBean[].class)
 			.block();
-				
-		return Arrays.asList(personas);	
+		
+		return new ResponseEntity<List<PersonaBean>>( Arrays.asList(personas) ,HttpStatusCode.valueOf(200));
+
 	}
 	
 	//alta asincrona 
 	@GetMapping(value = "/personaAsyn/{nombre}/{email}/{edad}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<PersonaBean> altaPersonaAsyn (String nombre, String email, int edad){
+	public CompletableFuture<List<PersonaBean>> altaPersonaAsyn (@PathVariable("nombre") String nombre, @PathVariable("email") String email, @PathVariable("edad") int edad){
 		PersonaBean persona = new PersonaBean(nombre, email, edad);
-		CompletableFuture<List<PersonaBean>> result = personaAsynService.llamadaAsincrona(persona);
-		try {
-			return result.get();
-		} catch (InterruptedException | ExecutionException e) {
-			return null;
-		}
+		return personaAsynService.llamadaAsincrona(persona);
+		
 	}
 	
 
