@@ -8,6 +8,7 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.clientes.model.PersonaBean;
+import com.clientes.service.LoginService;
 import com.clientes.service.PersonaAsynService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,8 +29,12 @@ import lombok.RequiredArgsConstructor;
 @RestController
 public class PersonaController {
 	private final PersonaAsynService personaAsynService;
+	private final LoginService loginService;
 	private final WebClient webClient;
 	private String urlBase = "http://localhost:8080/";
+	private String user = "admin";
+	private String pass = "1234";
+			
 	
 	@GetMapping(value = "/persona/{nombre}/{email}/{edad}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<PersonaBean>> altaPersona(
@@ -38,11 +44,14 @@ public class PersonaController {
 		
 		PersonaBean persona = new PersonaBean(nombre, email, edad);
 		
+		String token = loginService.optenerToken(user, pass);
+		
 		//alta a contactos-ms
 		PersonaBean respuesta = webClient
 			.post() //devuelve RequestBodyUriSpec
 			.uri(urlBase + "/contacto" ) //devuelve ResquestBodySpec
 			.contentType(MediaType.APPLICATION_JSON) //devuelve ResquestBoySpec
+			 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
 			.bodyValue(persona)//devuelve RequestHeadersSpec
 			.retrieve() //lanza llamada y devuel ve ResponseSpec
 			.onStatus(HttpStatusCode:: isError,
@@ -62,7 +71,7 @@ public class PersonaController {
 			.get()//RequestHeadersUriSpec
 			.uri(urlBase + "/contactos"
 					+ "" ) //devuelve ResquestHeaderSpec
-			.headers(h -> h.setBasicAuth("user2", "1234"))
+			.header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
 			.retrieve()//lanza llamada y devuel ve ResponseSpec
 			.bodyToMono(PersonaBean[].class)
 			.block();

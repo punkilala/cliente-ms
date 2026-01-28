@@ -1,5 +1,6 @@
 package com.clientes.service;
 
+import java.net.http.HttpHeaders;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class PersonaAsynServiceImpl implements PersonaAsynService {
 	
 	private String urlBase = "http://localhost:8080/";
+	private final LoginService loginService;
 	private final WebClient webClient;
 	@Value("${app.user.user2}")
     private String user2;
@@ -35,12 +37,15 @@ public class PersonaAsynServiceImpl implements PersonaAsynService {
 	@Async
 	public CompletableFuture<List<PersonaBean>> llamadaAsincrona(PersonaBean persona) {
 		
+		String token = loginService.optenerToken("admin", "1234");
+		
+		
 		webClient
 				.post()
 				.uri(urlBase + "/contacto")
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(persona)
-				.header("Authorization", "Basic " + stringToBase64( user2, passUser2))
+				.header("Authorization", "Bearer " + token)
 				.retrieve()
 				.onStatus(HttpStatusCode ::isError,
 						response ->response.bodyToMono(String.class)
@@ -57,7 +62,7 @@ public class PersonaAsynServiceImpl implements PersonaAsynService {
 		PersonaBean[] personasResponse = webClient
 				.get()
 				.uri(urlBase + "/contactos")
-				.header("Authorization", "Basic " + stringToBase64(user1, passUser1))
+				.header("Authorization", "Bearer " + token)
 				.retrieve()
 				.bodyToMono(PersonaBean[].class)
 				.block();
