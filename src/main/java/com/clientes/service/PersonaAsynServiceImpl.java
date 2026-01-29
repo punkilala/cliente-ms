@@ -37,7 +37,7 @@ public class PersonaAsynServiceImpl implements PersonaAsynService {
 	@Async
 	public CompletableFuture<List<PersonaBean>> llamadaAsincrona(PersonaBean persona) {
 		
-		String token = loginService.optenerToken("admin", "1234");
+		String token = loginService.optenerToken();
 		
 		
 		webClient

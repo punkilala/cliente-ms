@@ -44,7 +44,7 @@ public class PersonaController {
 		
 		PersonaBean persona = new PersonaBean(nombre, email, edad);
 		
-		String token = loginService.optenerToken(user, pass);
+		String token = loginService.optenerToken();
 		
 		//alta a contactos-ms
 		PersonaBean respuesta = webClient
