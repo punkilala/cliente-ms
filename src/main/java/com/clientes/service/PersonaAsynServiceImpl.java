@@ -21,9 +21,9 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class PersonaAsynServiceImpl implements PersonaAsynService {
 	
-	private String urlBase = "http://localhost:8080/";
+	private String urlBase = "http://CONTACTOS-MS";
 	private final LoginService loginService;
-	private final WebClient webClient;
+	private final WebClient.Builder webClient;
 	@Value("${app.user.user2}")
     private String user2;
     @Value("${app.pass.user2}")
@@ -37,15 +37,14 @@ public class PersonaAsynServiceImpl implements PersonaAsynService {
 	@Async
 	public CompletableFuture<List<PersonaBean>> llamadaAsincrona(PersonaBean persona) {
 		
-		String token = loginService.optenerToken();
+	
 		
 		
-		webClient
+		webClient.build()
 				.post()
 				.uri(urlBase + "/contacto")
 				.contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(persona)
-				.header("Authorization", "Bearer " + token)
 				.retrieve()
 				.onStatus(HttpStatusCode ::isError,
 						response ->response.bodyToMono(String.class)
@@ -59,10 +58,9 @@ public class PersonaAsynServiceImpl implements PersonaAsynService {
 				.bodyToMono(PersonaBean.class)
 				.block();
 		
-		PersonaBean[] personasResponse = webClient
+		PersonaBean[] personasResponse = webClient.build()
 				.get()
 				.uri(urlBase + "/contactos")
-				.header("Authorization", "Bearer " + token)
 				.retrieve()
 				.bodyToMono(PersonaBean[].class)
 				.block();

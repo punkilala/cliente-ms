@@ -1,0 +1,20 @@
+# Conversion to YAML from Properties formar report
+# Warnings:
+# - The yaml file had comments which are lost in the refactoring!
+spring:
+  application:
+    name: cliente-ms
+server:
+  port: 8081
+app:
+  user:
+    user2: user2
+    user1: user1
+  pass:
+    user2: 1234
+    user1: 1234
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: false

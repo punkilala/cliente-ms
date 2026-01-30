@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
-	private final WebClient webClient;
+	private final WebClient.Builder webClient;
 	
 	String urlService="http://localhost:8000";
 	String urlKeycloak="http://localhost:8070/realms/ContactosRealm/protocol/openid-connect/token";
@@ -24,7 +24,7 @@ public class LoginServiceImpl implements LoginService {
 	@Override
 	public String optenerToken() {
 		
-		TokenOauthBean token =  webClient
+		TokenOauthBean token =  webClient.build()
 				.post()
 				.uri(urlKeycloak)
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)

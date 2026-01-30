@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class PersonaController {
 	private final PersonaAsynService personaAsynService;
 	private final LoginService loginService;
-	private final WebClient webClient;
+	private final WebClient.Builder webClient;
 	private String urlBase = "http://localhost:8080/";
 	private String user = "admin";
 	private String pass = "1234";
@@ -47,7 +47,7 @@ public class PersonaController {
 		String token = loginService.optenerToken();
 		
 		//alta a contactos-ms
-		PersonaBean respuesta = webClient
+		PersonaBean respuesta = webClient.build()
 			.post() //devuelve RequestBodyUriSpec
 			.uri(urlBase + "/contacto" ) //devuelve ResquestBodySpec
 			.contentType(MediaType.APPLICATION_JSON) //devuelve ResquestBoySpec
@@ -67,7 +67,7 @@ public class PersonaController {
 			.block(); //esperamos a recibir datos porque este servicio no es reactivo
 			
 		//recuperar lista contactos
-		PersonaBean[] personas = webClient
+		PersonaBean[] personas = webClient.build()
 			.get()//RequestHeadersUriSpec
 			.uri(urlBase + "/contactos"
 					+ "" ) //devuelve ResquestHeaderSpec
