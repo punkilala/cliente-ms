@@ -12,7 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @EnableAsync
 @Configuration
 public class PersonaConfiguracion {
-	//crear bean para las llamadas con RestTemplate
+	    //crear bean para las llamadas con RestTemplate
 		@Bean
 		@LoadBalanced // para que reconozca eureka
 		public WebClient.Builder webClientBuilder() {
